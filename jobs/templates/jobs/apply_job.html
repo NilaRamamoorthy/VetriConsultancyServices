@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="container mt-5" style="max-width: 800px;">
+    <h2 class="fw-bold mb-3">Apply for: {{ job.title }}</h2>
+    <p class="text-muted mb-4"><strong>Company:</strong> {{ job.company }} | <strong>Location:</strong> {{ job.location }}</p>
+
+    <div class="card shadow-sm border-0">
+        <div class="card-body">
+            <form method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+
+                <!-- Candidate First & Last Name -->
+                <div class="row g-3 mb-3">
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">First Name</label>
+                        <input type="text" class="form-control" value="{{ profile.first_name }}" disabled>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">Last Name</label>
+                        <input type="text" class="form-control" value="{{ profile.last_name }}" disabled>
+                    </div>
+                </div>
+
+                <!-- Email -->
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Email</label>
+                    <input type="email" class="form-control" value="{{ user.email }}" disabled>
+                </div>
+
+                <!-- Resume -->
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Resume</label>
+                    {% if profile.resume %}
+                        <p>Current: <a href="{{ profile.resume.url }}" target="_blank">{{ profile.resume.name|slice:"10:" }}</a></p>
+                    {% endif %}
+                    {{ form.resume }}
+                </div>
+
+                <!-- Cover Letter -->
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Cover Letter (optional)</label>
+                    {{ form.cover_letter }}
+                </div>
+
+                <div class="d-flex justify-content-end">
+                    <a href="{% url 'jobs:job_detail' job.id %}" class="btn btn-outline-secondary me-2">
+                        Cancel
+                    </a>
+                    <button type="submit" class="btn btn-success">
+                        <i class="bi bi-send"></i> Submit Application
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

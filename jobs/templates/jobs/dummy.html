@@ -1,0 +1,254 @@
+from django.shortcuts import render, get_object_or_404, redirect
+from django.core.paginator import Paginator
+from django.contrib.auth.decorators import login_required
+from .models import Job, SavedJob, Application
+from profiles.models import CandidateProfile
+
+# ----------------------------
+# JOBS LIST
+# ----------------------------
+from django.contrib.auth.decorators import login_required
+from django.core.paginator import Paginator
+from .models import Job, SavedJob, Application
+
+@login_required
+def jobs_list_view(request):
+    jobs = Job.objects.filter(is_active=True).order_by('-posted_on')
+
+    # --------------------
+    # Filters
+    # --------------------
+    experience = request.GET.get('experience')
+    location = request.GET.get('location')
+    job_type = request.GET.get('job_type')
+    domain = request.GET.get('domain')
+    skills = request.GET.get('skills')
+
+    if experience:
+        jobs = jobs.filter(experience__lte=experience)
+    if location:
+        jobs = jobs.filter(location__icontains=location)
+    if job_type:
+        jobs = jobs.filter(job_type=job_type)
+    if domain:
+        jobs = jobs.filter(domain__icontains=domain)
+    if skills:
+        jobs = jobs.filter(skills__icontains=skills)
+
+    # --------------------
+    # Saved & Applied jobs (⭐ KEY PART)
+    # --------------------
+    saved_job_ids = set(
+        SavedJob.objects.filter(user=request.user)
+        .values_list('job_id', flat=True)
+    )
+
+    applied_job_ids = set(
+        Application.objects.filter(user=request.user)
+        .values_list('job_id', flat=True)
+    )
+
+    # --------------------
+    # Pagination
+    # --------------------
+    paginator = Paginator(jobs, 6)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
+    return render(request, 'jobs/jobs_list.html', {
+        'page_obj': page_obj,
+        'filters': request.GET,
+        'saved_job_ids': saved_job_ids,
+        'applied_job_ids': applied_job_ids,
+    })
+
+
+# ----------------------------
+# JOB DETAIL
+# ----------------------------
+@login_required
+def job_detail_view(request, job_id):
+    job = get_object_or_404(Job, id=job_id)
+    user = request.user
+
+    applied = False
+    saved = False
+    is_owner = False
+
+    if user.role == 'CANDIDATE':
+        applied = Application.objects.filter(user=user, job=job).exists()
+        saved = SavedJob.objects.filter(user=user, job=job).exists()
+
+    if user.role == 'CONSULTANT' and job.posted_by == user:
+        is_owner = True
+
+    applicants_count = job.applications.count()  # placeholder
+
+    return render(request, 'jobs/job_detail.html', {
+        'job': job,
+        'applied': applied,
+        'saved': saved,
+        'is_owner': is_owner,
+        'applicants_count': applicants_count,
+    })
+
+
+
+# ----------------------------
+# SAVE JOB
+# ----------------------------
+from django.contrib import messages
+
+@login_required
+def save_job_view(request, job_id):
+    job = get_object_or_404(Job, id=job_id)
+
+    saved, created = SavedJob.objects.get_or_create(
+        user=request.user,
+        job=job
+    )
+
+    if created:
+        messages.success(request, "Job saved successfully.")
+    else:
+        messages.info(request, "You have already saved this job.")
+
+    return redirect('jobs:job_detail', job_id=job.id)
+
+from django.shortcuts import redirect, get_object_or_404
+from .models import SavedJob, Job
+
+@login_required
+def unsave_job(request, job_id):
+    SavedJob.objects.filter(
+        user=request.user,
+        job_id=job_id
+    ).delete()
+
+    return redirect('jobs:saved_jobs')
+
+
+# ----------------------------
+# APPLY JOB
+# ----------------------------
+@login_required
+def apply_job_view(request, job_id):
+    job = get_object_or_404(Job, id=job_id)
+    user = request.user
+    profile = CandidateProfile.objects.get(user=user)
+
+    if Application.objects.filter(user=user, job=job).exists():
+        return redirect('jobs:job_detail', job_id=job.id)
+
+    if request.method == "POST":
+        cover_letter = request.POST.get('cover_letter')
+        Application.objects.create(user=user, job=job, resume=profile.resume, cover_letter=cover_letter)
+        return redirect('jobs:job_detail', job_id=job.id)
+
+    return render(request, 'jobs/apply_job.html', {'job': job, 'profile': profile})
+
+
+# ----------------------------
+# SAVED JOBS LIST
+# ----------------------------
+from django.contrib.auth.decorators import login_required
+from .models import SavedJob
+
+@login_required
+def saved_jobs_list_view(request):
+    saved_jobs = SavedJob.objects.filter(
+        user=request.user
+    ).select_related('job')
+
+    return render(
+        request,
+        'jobs/saved_jobs.html',
+        {'saved_jobs': saved_jobs}
+    )
+
+# ----------------------------
+# Post JOBS 
+# ----------------------------
+
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import render, redirect
+from .models import Job
+
+@login_required
+def post_job_view(request):
+    if request.user.role != 'CONSULTANT':
+        return redirect('jobs:jobs_list')
+
+    if request.method == 'POST':
+        Job.objects.create(
+            posted_by=request.user,
+            title=request.POST.get('title'),
+            company=request.POST.get('company'),
+            location=request.POST.get('location'),
+            experience=request.POST.get('experience'),
+            job_type=request.POST.get('job_type'),
+            domain=request.POST.get('domain'),
+            skills=request.POST.get('skills'),
+            description=request.POST.get('description'),
+        )
+        return redirect('accounts:consultant_dashboard')
+
+    return render(request, 'jobs/post_job.html')
+
+# ----------------------------
+# Post JOBS view
+# ----------------------------
+
+@login_required
+def posted_jobs_view(request):
+    if request.user.role != 'CONSULTANT':
+        return redirect('jobs:jobs_list')
+
+    jobs = Job.objects.filter(posted_by=request.user).order_by('-posted_on')
+
+    return render(request, 'jobs/posted_jobs.html', {
+        'jobs': jobs
+    })
+
+# ----------------------------
+# Delete Saved JOBS 
+# ----------------------------
+
+@login_required
+def delete_job_view(request, job_id):
+    job = get_object_or_404(
+        Job,
+        id=job_id,
+        posted_by=request.user
+    )
+    job.delete()
+    return redirect('jobs:posted_jobs')
+
+# ----------------------------
+# Edit Posted JOBS 
+# ----------------------------
+
+from django.contrib.auth.decorators import login_required
+from django.http import HttpResponseForbidden
+from .forms import JobForm
+
+@login_required
+def edit_job_view(request, job_id):
+    job = get_object_or_404(Job, id=job_id)
+
+    # 🔐 Only consultant owner can edit
+    if request.user.role != 'CONSULTANT' or job.posted_by != request.user:
+        return HttpResponseForbidden("You are not allowed to edit this job.")
+
+    if request.method == 'POST':
+        form = JobForm(request.POST, instance=job)
+        if form.is_valid():
+            form.save()
+            return redirect('jobs:job_detail', job_id=job.id)
+    else:
+        form = JobForm(instance=job)
+
+    return render(request, 'jobs/edit_job.html', {
+        'form': form,
+        'job': job
+    })

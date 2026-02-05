@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-5">
+    <h2>Query Queue</h2>
+    <hr>
+    {% if queries %}
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Candidate</th>
+                    <th>Job</th>
+                    <th>Query</th>
+                    <th>Resolved</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for query in queries %}
+                <tr class="{% if not query.is_resolved %}table-warning{% endif %}">
+                    <td>{{ query.user.get_full_name|default:query.user.email }}</td>
+                    <td>{{ query.job.title }}</td>
+                    <td>{{ query.question|truncatechars:50 }}</td>
+                    <td>{{ query.is_resolved }}</td>
+                    <td>
+                        <a href="{% url 'jobs:job_queries' query.job.id %}" class="btn btn-sm btn-primary">
+                            Open
+                        </a>
+                        <form method="post" style="display:inline;">
+                            {% csrf_token %}
+                            <input type="hidden" name="query_id" value="{{ query.id }}">
+                            <button type="submit" name="resolve" class="btn btn-sm btn-success">
+                                {% if query.is_resolved %}Unresolve{% else %}Resolve{% endif %}
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>No queries found.</p>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="container mt-5">
+    <h2 class="mb-4">Shortlisted Applicants</h2>
+
+    {% if applications %}
+        <div class="row g-4">
+            {% for app in applications %}
+                <div class="col-md-6">
+                    <div class="card shadow-sm h-100">
+                        <div class="card-body">
+                            <h5 class="card-title">{{ app.user.first_name }} {{ app.user.last_name }}</h5>
+                            <p class="text-muted">{{ app.user.email }}</p>
+                            <p><strong>Job:</strong> {{ app.job.title }}</p>
+                            <p><strong>Applied At:</strong> {{ app.applied_at|date:"d M Y H:i" }}</p>
+                            <p>
+                                <strong>Status:</strong>
+                                <span class="badge 
+                                    {% if app.status == 'SHORTLISTED' %}bg-success
+                                    {% elif app.status == 'PENDING' %}bg-warning
+                                    {% else %}bg-danger
+                                    {% endif %}">
+                                    {{ app.status }}
+                                </span>
+                            </p>
+                            <p>
+                                <strong>Meeting:</strong>
+                                <span class="badge 
+                                    {% if app.meeting_status == 'SCHEDULED' %}bg-primary
+                                    {% elif app.meeting_status == 'POSTPONED' %}bg-secondary
+                                    {% else %}bg-light text-dark
+                                    {% endif %}">
+                                    {{ app.get_meeting_status_display }}
+                                </span>
+                            </p>
+                        </div>
+                        <div class="card-footer d-flex gap-2">
+                            <a href="{% url 'jobs:applicant_detail' app.id %}" class="btn btn-outline-primary w-100">
+                                View / Update
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p class="text-muted text-center mt-5">No shortlisted applicants yet.</p>
+    {% endif %}
+</div>
+
+{% endblock %}

@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+
+<div class="mb-4">
+    <div class="d-flex align-items-center gap-3">
+        {% if user.consultant_profile.profile_image %}
+            <img src="{{ user.consultant_profile.profile_image.url }}" 
+                 alt="Profile Image" 
+                 class="rounded-circle" 
+                 style="width:80px; height:80px; object-fit:cover;">
+        {% else %}
+            <img src="{% static 'images/default_profile.png' %}" 
+                 alt="Default Profile" 
+                 class="rounded-circle" 
+                 style="width:80px; height:80px; object-fit:cover;">
+        {% endif %}
+        <div>
+            <h2 class="mb-0">{{ user.consultant_profile.first_name }} {{ user.consultant_profile.last_name }}</h2>
+            <p class="text-muted mb-1">Role: {{ user.get_role_display }}</p>
+            <p class="mb-0">
+                Profile Completeness: 
+                <span class="fw-bold">{{ user.consultant_profile.profile_completeness }}%</span>
+            </p>
+            <a href="{% url 'profiles:consultant_profile' %}" class="btn btn-sm btn-outline-primary mt-1">
+                Edit Profile
+            </a>
+        </div>
+    </div>
+</div>
+
+<hr>
+
+<div class="row g-4">
+    <!-- Manage Job Card -->
+    <div class="col-md-6">
+        <div class="card shadow-sm border-warning h-100">
+            <div class="card-body">
+                <h5 class="card-title">My Posted Jobs</h5>
+                <p>View, manage, or delete jobs you have posted.</p>
+                <a href="{% url 'jobs:posted_jobs' %}" class="btn btn-warning">
+                    <i class="bi bi-briefcase-fill"></i> Manage Jobs
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Post Job Card -->
+    <div class="col-md-6">
+        <div class="card shadow-sm border-success h-100">
+            <div class="card-body">
+                <h5 class="card-title">Post a New Job</h5>
+                <p>Create and publish new job opportunities for candidates.</p>
+                <a href="{% url 'jobs:post_job' %}" class="btn btn-success">
+                    <i class="bi bi-plus-circle"></i> Add Job
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Query Queue Card -->
+    <div class="col-md-6">
+        <div class="card shadow-sm h-100">
+            <div class="card-body">
+                <h5 class="card-title">Query Queue</h5>
+                <p>Respond to candidate queries for your jobs.</p>
+                <a href="{% url 'jobs:query_queue' %}" class="btn btn-primary">
+                    View Queue
+                    {% if unread_queries_count %}
+                        <span class="badge bg-danger">{{ unread_queries_count }}</span>
+                    {% endif %}
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Appointments -->
+    <div class="col-md-6">
+        <div class="card shadow-sm h-100">
+            <div class="card-body">
+                <h5 class="card-title">Appointments</h5>
+                <p>Schedule and manage meetings with shortlisted candidates.</p>
+                <a href="{% url 'jobs:shortlisted_applicants' %}" class="btn btn-primary">View Appointments</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

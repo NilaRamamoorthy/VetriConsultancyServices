@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h2 class="mb-4">Welcome, {{ user.email }}</h2>
+<p class="text-muted">Role: {{ user.get_role_display }}</p>
+<hr>
+
+<div class="row g-4">
+    <div class="col-md-4">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <h5 class="card-title">Manage Jobs</h5>
+                <p>Create and manage job postings for candidates.</p>
+                <a href="/admin/" class="btn btn-primary">Go to Admin</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <h5 class="card-title">Manage Users</h5>
+                <p>View and edit candidate and consultant accounts.</p>
+                <a href="/admin/" class="btn btn-primary">Go to Admin</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

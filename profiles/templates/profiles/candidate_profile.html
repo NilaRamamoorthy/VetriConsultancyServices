@@ -1,0 +1,238 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+
+<div class="container mt-5">
+    {% if messages %}
+  {% for message in messages %}
+    <div class="alert alert-{{ message.tags }} fade show auto-dismiss">
+      {{ message }}
+    </div>
+  {% endfor %}
+{% endif %}
+
+    <h2 class="mb-4">My Profile</h2>
+    <!-- <img src="https://static.vecteezy.com/system/resources/thumbnails/035/857/753/small/people-face-avatar-icon-cartoon-character-png.png"
+     width="120"
+     height="120"> -->
+
+{% if profile.profile_image %}
+    <img src="{{ profile.profile_image.url }}"
+         class="rounded-circle"
+         width="120"
+         height="120"
+         style="object-fit: cover;">
+{% else %}
+    <img src="{% static 'images/default.jpg' %}"
+         class="rounded-circle"
+         width="120"
+         height="120"
+         style="object-fit: cover;">
+{% endif %}
+
+    <hr>
+
+    {% if profile %}
+    <!-- Profile Details -->
+    <div class="row g-3">
+      
+
+        <div class="col-md-6">
+            <strong>First Name:</strong> {{ profile.first_name|default:"-" }}
+        </div>
+
+        <div class="col-md-6">
+            <strong>Last Name:</strong> {{ profile.last_name|default:"-" }}
+        </div>
+
+        <div class="col-md-6">
+            <strong>Phone:</strong> {{ profile.phone|default:"-" }}
+        </div>
+
+        <div class="col-md-6">
+            <strong>Location:</strong> {{ profile.location|default:"-" }}
+        </div>
+
+        <div class="col-md-6">
+            <strong>Skills:</strong>
+            {% if skills_list %}
+            {% for skill in skills_list %}
+            <span class="badge bg-info text-dark me-1">{{ skill }}</span>
+            {% endfor %}
+            {% else %}
+            -
+            {% endif %}
+        </div>
+
+        <div class="col-md-6">
+            <strong>Experience (Years):</strong> {{ profile.experience_years|default:"-" }}
+        </div>
+
+        <div class="col-md-6">
+            <strong>Resume:</strong>
+            {% if profile.resume %}
+            <a href="{{ profile.resume.url }}" target="_blank">
+                {{ profile.resume.name|slice:"10:" }}
+            </a>
+            {% else %}
+            -
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Edit Button -->
+    <button class="btn btn-primary mt-4" data-bs-toggle="modal" data-bs-target="#editProfileModal">
+        <i class="bi bi-pencil-square"></i> Edit Profile
+    </button>
+
+    {% else %}
+    <p class="text-muted">No profile details found.</p>
+    {% endif %}
+</div>
+
+<!-- ================= MODAL ================= -->
+<div class="modal fade" id="editProfileModal" tabindex="-1">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Edit Profile</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+
+            <div class="modal-body">
+                <form method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <div class="row g-3">
+
+                        <!-- Profile Image -->
+                        <div class="col-12 text-center">
+                            {% if profile.profile_image %}
+                            <img src="{{ profile.profile_image.url }}" class="rounded-circle mb-2" width="120"
+                                height="120">
+                            {% else %}
+                            <img src="{% static 'images/default.jpg' %}" class="rounded-circle mb-2" width="120"
+                                height="120">
+                            {% endif %}
+                            <input type="file" name="profile_image" class="form-control mt-2">
+                        </div>
+
+                        <div class="col-md-6">
+                            <label>First Name</label>
+                            <input type="text" name="first_name" class="form-control" value="{{ profile.first_name }}">
+                        </div>
+
+                        <div class="col-md-6">
+                            <label>Last Name</label>
+                            <input type="text" name="last_name" class="form-control" value="{{ profile.last_name }}">
+                        </div>
+
+                        <div class="col-md-6">
+                            <label>Phone</label>
+                            <input type="text" name="phone" class="form-control" value="{{ profile.phone }}">
+                        </div>
+
+                        <div class="col-md-6">
+                            <label>Location</label>
+                            <input type="text" name="location" class="form-control" value="{{ profile.location }}">
+                        </div>
+
+                        <!-- Skills -->
+                        <div class="col-md-6">
+                            <label>Skills</label>
+                            <div class="input-group mb-2">
+                                <input type="text" id="skillInput" class="form-control" placeholder="Enter skill">
+                                <button type="button" id="addSkillBtn" class="btn btn-outline-primary">Add</button>
+                            </div>
+
+                            <div id="skillsContainer">
+                                {% for skill in skills_list %}
+                                <span class="badge bg-secondary me-1 mb-1 skill-badge">
+                                    {{ skill }}
+                                    <button type="button"
+                                        class="btn-close btn-close-white btn-sm ms-1 remove-skill"></button>
+                                </span>
+                                {% endfor %}
+                            </div>
+
+                            <input type="hidden" name="skills" id="skillsHidden" value="{{ profile.skills }}">
+                        </div>
+
+                        <div class="col-md-6">
+                            <label>Experience (Years)</label>
+                            <input type="number" step="0.1" name="experience_years" class="form-control"
+                                value="{{ profile.experience_years }}">
+                        </div>
+
+
+                        <div class="mb-3">
+                            <label class="form-label">Resume</label>
+                            <input type="file" name="resume" class="form-control">
+                        </div>
+
+                        {% if profile.resume %}
+                        <div class="alert alert-info">
+                            <strong>Current Resume:</strong>
+                            <a href="{{ profile.resume.url }}" target="_blank">
+                                View / Download
+                            </a>
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="mt-4 text-end">
+                        <button class="btn btn-success">Save Changes</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ================= SKILLS JS ================= -->
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const addBtn = document.getElementById('addSkillBtn');
+        const skillInput = document.getElementById('skillInput');
+        const container = document.getElementById('skillsContainer');
+        const hidden = document.getElementById('skillsHidden');
+
+        function sync() {
+            hidden.value = [...container.querySelectorAll('.skill-badge')]
+                .map(s => s.firstChild.textContent.trim())
+                .join(',');
+        }
+
+        addBtn.onclick = () => {
+            if (!skillInput.value.trim()) return;
+            const span = document.createElement('span');
+            span.className = 'badge bg-secondary me-1 mb-1 skill-badge';
+            span.innerHTML = `${skillInput.value}
+            <button type="button"
+                class="btn-close btn-close-white btn-sm ms-1 remove-skill"></button>`;
+            container.appendChild(span);
+            skillInput.value = '';
+            sync();
+        };
+
+        container.onclick = e => {
+            if (e.target.classList.contains('remove-skill')) {
+                e.target.parentElement.remove();
+                sync();
+            }
+        };
+    });
+</script>
+<script>
+  setTimeout(function () {
+    document.querySelectorAll('.auto-dismiss').forEach(function (alert) {
+      alert.classList.remove('show');
+      alert.classList.add('fade');
+
+      setTimeout(() => alert.remove(), 500); // remove from DOM
+    });
+  }, 2000); // ⏱️ 2 seconds
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+{% endblock %}

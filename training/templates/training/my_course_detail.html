@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h2>{{ enrollment.course.title }}</h2>
+<p class="text-muted">{{ enrollment.course.description }}</p>
+
+
+<!-- Progress Bar -->
+<div class="mt-3">
+    <label>Progress:</label>
+    <div class="progress">
+        <div class="progress-bar" role="progressbar"
+             style="width: {{ enrollment.progress }}%;" 
+             aria-valuenow="{{ enrollment.progress }}" 
+             aria-valuemin="0" aria-valuemax="100">
+            {{ enrollment.progress }}%
+        </div>
+    </div>
+</div>
+
+{% if enrollment.completed %}
+<p class="mt-3 text-success">Course Completed!</p>
+{% else %}
+<p class="mt-3 text-muted">Course in progress. Certificate will be issued at the end of the course.</p>
+{% endif %}
+
+{% if enrollment.certificate %}
+<p class="mt-2">
+    Certificate: <a href="{{ enrollment.certificate.url }}" target="_blank">Download</a>
+</p>
+{% endif %}
+
+
+<a href="{% url 'training:my_courses' %}" class="btn btn-secondary mt-3">Back to My Courses</a>
+
+{% endblock %}

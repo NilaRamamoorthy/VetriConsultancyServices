@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="container mt-5">
+    <h2 class="mb-4">Applicant: {{ application.user.first_name }} {{ application.user.last_name }}</h2>
+    <p><strong>Email:</strong> {{ application.user.email }}</p>
+    <p><strong>Applied At:</strong> {{ application.applied_at|date:"d M Y H:i" }}</p>
+    <p><strong>Status:</strong>
+        {% if application.status == 'PENDING' %}
+            <span class="badge bg-warning">Pending</span>
+        {% elif application.status == 'SHORTLISTED' %}
+            <span class="badge bg-success">Shortlisted</span>
+        {% elif application.status == 'REJECTED' %}
+            <span class="badge bg-danger">Rejected</span>
+        {% endif %}
+    </p>
+
+    <hr>
+
+    <h5>Resume</h5>
+    {% if application.resume %}
+        <a href="{{ application.resume.url }}" target="_blank">{{ application.resume.name|slice:"10:" }}</a>
+    {% else %}
+        <p class="text-muted">No resume uploaded.</p>
+    {% endif %}
+
+    <h5 class="mt-3">Cover Letter</h5>
+    <p>{{ application.cover_letter|default:"-" }}</p>
+
+    <!-- Actions -->
+    <form method="post" class="mt-4 d-flex gap-2">
+        {% csrf_token %}
+        <button name="action" value="shortlist" class="btn btn-success" {% if application.status == 'SHORTLISTED' %}disabled{% endif %}>
+            Shortlist
+        </button>
+        <button name="action" value="reject" class="btn btn-danger" {% if application.status == 'REJECTED' %}disabled{% endif %}>
+            Reject
+        </button>
+
+        <!-- Meeting Button: only enabled if shortlisted -->
+        {% if application.status == 'SHORTLISTED' %}
+            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#meetingModal">
+                {% if application.meeting_status == 'SCHEDULED' %}
+                    Meeting Scheduled
+                {% else %}
+                    Schedule Meeting
+                {% endif %}
+            </button>
+        {% else %}
+            <button type="button" class="btn btn-primary" disabled>
+                Schedule Meeting
+            </button>
+        {% endif %}
+
+        <a href="{% url 'jobs:applicants_list' application.job.id %}" class="btn btn-secondary">Back to Applicants</a>
+    </form>
+</div>
+
+<!-- ==================== Meeting Modal ==================== -->
+<div class="modal fade" id="meetingModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <form method="post">
+                {% csrf_token %}
+                <div class="modal-header">
+                    <h5 class="modal-title">Schedule Meeting</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+
+                    <label class="form-label">Meeting Date & Time</label>
+                    <input type="datetime-local" name="meeting_datetime" class="form-control"
+                        value="{{ application.meeting_datetime|date:'Y-m-d\\TH:i' }}" 
+                        {% if application.meeting_status == 'SCHEDULED' %}disabled{% endif %}>
+
+                </div>
+                <div class="modal-footer d-flex justify-content-between">
+                    {% if application.meeting_status == 'SCHEDULED' %}
+                        <button type="submit" name="action" value="change_meeting" class="btn btn-warning">
+                            Change
+                        </button>
+                        <button type="submit" name="action" value="cancel_meeting" class="btn btn-danger">
+                            Cancel Meeting
+                        </button>
+                    {% else %}
+                        <button type="submit" name="action" value="schedule_meeting" class="btn btn-success">
+                            Schedule
+                        </button>
+                    {% endif %}
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+{% endblock %}

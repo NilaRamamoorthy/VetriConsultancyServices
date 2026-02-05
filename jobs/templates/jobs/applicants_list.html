@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="container mt-5">
+    <h2 class="mb-4">Applicants for: {{ job.title }}</h2>
+
+    {% if applications %}
+        <div class="list-group">
+            {% for app in applications %}
+                <a href="{% url 'jobs:applicant_detail' app.id %}"
+                   class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+
+                    <div>
+                        <strong>{{ app.user.first_name }} {{ app.user.last_name }}</strong>
+                        <br>
+                        <small class="text-muted">{{ app.user.email }}</small>
+                    </div>
+
+                    <span class="badge 
+                        {% if app.status == 'PENDING' %}bg-warning
+                        {% elif app.status == 'SHORTLISTED' %}bg-success
+                        {% elif app.status == 'REJECTED' %}bg-danger
+                        {% endif %} rounded-pill">
+                        {% if app.status == 'PENDING' %}
+                            Pending
+                        {% elif app.status == 'SHORTLISTED' %}
+                            Shortlisted
+                        {% elif app.status == 'REJECTED' %}
+                            Rejected
+                        {% endif %}
+                    </span>
+
+                </a>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p class="text-muted">No applicants yet for this job.</p>
+    {% endif %}
+
+    <a href="{% url 'jobs:job_detail' job.id %}" class="btn btn-secondary mt-3">Back to Job</a>
+</div>
+
+{% endblock %}

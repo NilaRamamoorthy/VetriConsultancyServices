@@ -1,0 +1,85 @@
+<!-- {% extends "base.html" %}
+{% block content %}
+
+<div class="container mt-5">
+    <h2 class="fw-bold mb-4">Query Queue</h2>
+
+    {% if queries %}
+        <div class="list-group">
+            {% for query in queries %}
+                <a href="{% url 'jobs:job_queries' query.job.id %}"
+                   class="list-group-item list-group-item-action">
+
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <strong>
+                                {{ query.user.first_name }} {{ query.user.last_name }}
+                            </strong>
+                            <small class="text-muted d-block">
+                                {{ query.user.email }}
+                            </small>
+
+                            <p class="mb-1 mt-2">
+                                {{ query.question|truncatechars:120 }}
+                            </p>
+
+                            <small class="text-muted">
+                                Job: {{ query.job.title }}
+                            </small>
+                        </div>
+
+                        <span class="badge bg-info text-dark">
+                            {{ query.created_at|date:"d M Y H:i" }}
+                        </span>
+                    </div>
+                </a>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p class="text-muted">No queries yet.</p>
+    {% endif %}
+</div>
+
+{% endblock %} -->
+
+
+{% extends "base.html" %}
+{% block content %}
+
+<div class="container mt-5">
+    <h3 class="mb-4">Query Queue</h3>
+
+    {% for query in queries %}
+    <div class="card mb-3 {% if not query.is_resolved %}border-warning{% endif %}">
+        <div class="card-body">
+            <div class="d-flex justify-content-between">
+                <div>
+                    <h6 class="mb-1">{{ query.job.title }}</h6>
+                    <small class="text-muted">
+                        {{ query.user.email }} • {{ query.created_at|date:"d M Y H:i" }}
+                    </small>
+                </div>
+
+                {% if query.is_resolved %}
+                    <span class="badge bg-success">Resolved</span>
+                {% else %}
+                    <span class="badge bg-warning text-dark">Pending</span>
+                {% endif %}
+            </div>
+
+            <p class="mt-2 mb-2">
+                {{ query.question|truncatechars:120 }}
+            </p>
+
+            <a href="{% url 'jobs:job_queries' query.job.id %}"
+               class="btn btn-outline-primary btn-sm">
+                Open Conversation
+            </a>
+        </div>
+    </div>
+    {% empty %}
+        <p class="text-muted">No queries found.</p>
+    {% endfor %}
+</div>
+
+{% endblock %}

@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="container mt-5">
+    <h2 class="fw-bold">Job Queries: {{ job.title }}</h2>
+    <p class="text-muted">View and reply to queries below.</p>
+    <hr>
+
+    <!-- Candidate: Submit New Query -->
+    {% if user.role == 'CANDIDATE' %}
+    <form method="post" class="mb-4">
+        {% csrf_token %}
+        <div class="mb-3">
+            <textarea name="question" class="form-control" rows="3" placeholder="Ask your query..." required></textarea>
+        </div>
+        <button class="btn btn-primary">Submit Query</button>
+    </form>
+    {% endif %}
+
+    <!-- Queries & Replies -->
+    {% if queries %}
+    <div class="list-group">
+        {% for query in queries %}
+        <div class="list-group-item mb-3 {% if not query.is_resolved %}border-warning border-3{% endif %}">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <p class="mb-1">
+                    <strong>{{ query.user.profile.first_name }} {{ query.user.profile.last_name|default:query.user.email }}:</strong>
+                    {{ query.question }}
+                    <br>
+                    <small class="text-muted">{{ query.created_at|date:"d M Y H:i" }}</small>
+                </p>
+                {% if user.role == 'CONSULTANT' %}
+                <form method="post" class="m-0">
+                    {% csrf_token %}
+                    <input type="hidden" name="query_id" value="{{ query.id }}">
+                    <button type="submit" name="resolve" class="btn btn-sm {% if query.is_resolved %}btn-secondary{% else %}btn-success{% endif %}">
+                        {% if query.is_resolved %}Resolved{% else %}Mark Resolved{% endif %}
+                    </button>
+                </form>
+                {% endif %}
+            </div>
+
+            <!-- Replies -->
+            {% if query.replies.all %}
+                {% for reply in query.replies.all %}
+                <div class="ms-4 mb-2 p-2 border-start border-3 {% if reply.user.role == 'CONSULTANT' %}border-primary{% else %}border-secondary{% endif %} rounded">
+                    <strong>{{ reply.user.profile.first_name }} {{ reply.user.profile.last_name|default:reply.user.email }}:</strong>
+                    {{ reply.message }}
+                    <br>
+                    <small class="text-muted">{{ reply.created_at|date:"d M Y H:i" }}</small>
+                </div>
+                {% endfor %}
+            {% else %}
+                <p class="ms-4 text-muted">No replies yet.</p>
+            {% endif %}
+
+            <!-- Consultant Reply Form -->
+            {% if user.role == 'CONSULTANT' %}
+            <form method="post" class="mt-2 d-flex gap-2">
+                {% csrf_token %}
+                <input type="hidden" name="query_id" value="{{ query.id }}">
+                <input type="text" name="message" class="form-control" placeholder="Write a reply..." required>
+                <button class="btn btn-success">Reply</button>
+            </form>
+            {% endif %}
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+        <p class="text-muted">No queries yet for this job.</p>
+    {% endif %}
+
+</div>
+
+{% endblock %}

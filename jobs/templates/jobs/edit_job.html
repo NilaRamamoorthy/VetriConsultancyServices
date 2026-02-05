@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="container mt-5" style="max-width: 900px;">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="fw-bold">Edit Job</h2>
+
+        <a href="{% url 'jobs:job_detail' job.id %}" class="btn btn-outline-secondary">
+            ← Back to Job
+        </a>
+    </div>
+
+    <div class="card shadow-sm border-0">
+        <div class="card-body">
+
+            <form method="post">
+                {% csrf_token %}
+
+                <div class="row g-3">
+
+                    <!-- Job Title -->
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">Job Title</label>
+                        {{ form.title }}
+                    </div>
+
+                    <!-- Company -->
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">Company</label>
+                        {{ form.company }}
+                    </div>
+
+                    <!-- Location -->
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">Location</label>
+                        {{ form.location }}
+                    </div>
+
+                    <!-- Experience -->
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">Experience (Years)</label>
+                        {{ form.experience }}
+                    </div>
+
+                    <!-- Job Type -->
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">Job Type</label>
+                        {{ form.job_type }}
+                    </div>
+
+                    <!-- Domain -->
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">Domain</label>
+                        {{ form.domain }}
+                    </div>
+
+                    <!-- Skills -->
+                    <div class="col-md-12">
+                        <label class="form-label fw-semibold">Skills</label>
+                        {{ form.skills }}
+                        <small class="text-muted">
+                            Comma separated (e.g. Django, REST, PostgreSQL)
+                        </small>
+                    </div>
+
+                    <!-- Description -->
+                    <div class="col-md-12">
+                        <label class="form-label fw-semibold">Job Description</label>
+                        {{ form.description }}
+                    </div>
+
+                </div>
+
+                <hr class="my-4">
+
+                <div class="d-flex justify-content-end gap-2">
+                    <a href="{% url 'jobs:job_detail' job.id %}"
+                       class="btn btn-outline-secondary">
+                        Cancel
+                    </a>
+
+                    <button type="submit" class="btn btn-success">
+                        <i class="bi bi-check-circle"></i> Save Changes
+                    </button>
+                </div>
+
+            </form>
+
+        </div>
+    </div>
+
+</div>
+
+{% endblock %}

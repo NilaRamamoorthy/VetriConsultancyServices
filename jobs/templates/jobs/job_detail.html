@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="container mt-5">
+    <h2 class="fw-bold">{{ job.title }}</h2>
+
+    <p class="text-muted mb-1">
+        <strong>Company:</strong> {{ job.company }}
+    </p>
+    <p class="text-muted mb-1">
+        <strong>Location:</strong> {{ job.location }}
+    </p>
+    <p class="text-muted mb-1">
+        <strong>Posted At:</strong> {{ job.posted_on|date:"d M Y" }}
+    </p>
+
+    <hr>
+
+    <h5>Description</h5>
+    <p>{{ job.description }}</p>
+
+    <!-- ================= ACTIONS ================= -->
+    <div class="mt-4 d-flex gap-2 flex-wrap">
+
+        <!-- 🟢 CANDIDATE ACTIONS -->
+        {% if user.is_authenticated and user.role == 'CANDIDATE' %}
+
+        {% if saved %}
+        <button class="btn btn-secondary" disabled>
+            <i class="bi bi-bookmark-check"></i> Saved
+        </button>
+        {% else %}
+        <a href="{% url 'jobs:save_job' job.id %}" class="btn btn-outline-primary">
+            <i class="bi bi-bookmark"></i> Save Job
+        </a>
+        {% endif %}
+
+        {% if applied %}
+        <button class="btn btn-success" disabled>
+            <i class="bi bi-check-circle"></i> Already Applied
+        </button>
+        {% else %}
+        <a href="{% url 'jobs:apply_job' job.id %}" class="btn btn-success">
+            Apply Now
+        </a>
+        {% endif %}
+
+        <!-- Ask Query Button -->
+        <a href="{% url 'jobs:job_queries' job.id %}" class="btn btn-outline-info">
+            <i class="bi bi-chat-dots"></i> Ask / View Queries
+        </a>
+
+        {% endif %}
+
+        <!-- 🟣 CONSULTANT – OWNER ACTIONS -->
+        {% if user.is_authenticated and user.role == 'CONSULTANT' and is_owner %}
+
+        <!-- EDIT JOB -->
+        <a href="{% url 'jobs:edit_job' job.id %}" class="btn btn-outline-warning">
+            <i class="bi bi-pencil-square"></i> Edit Job
+        </a>
+
+        <!-- DELETE JOB -->
+        <a href="{% url 'jobs:delete_job' job.id %}" class="btn btn-outline-danger"
+            onclick="return confirm('Are you sure you want to delete this job? This will also remove all applicants.');">
+            <i class="bi bi-trash"></i> Delete Job
+        </a>
+
+        <!-- VIEW APPLICANTS -->
+        <a href="{% url 'jobs:applicants_list' job.id %}" class="btn btn-outline-primary position-relative">
+            <i class="bi bi-people"></i> View Applicants
+            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                {{ applicants_count }}
+            </span>
+        </a>
+
+        <!-- View Queries -->
+        <a href="{% url 'jobs:job_queries' job.id %}" class="btn btn-outline-info">
+            <i class="bi bi-chat-dots"></i> View Queries
+        </a>
+
+        {% endif %}
+
+    </div>
+
+
+</div>
+
+{% endblock %}

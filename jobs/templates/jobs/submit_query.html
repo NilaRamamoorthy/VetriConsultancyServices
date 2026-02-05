@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="container mt-5">
+    <h3>Ask a Question about: <strong>{{ job.title }}</strong></h3>
+    <p class="text-muted">Company: {{ job.company }}</p>
+    <hr>
+
+    <form method="post">
+        {% csrf_token %}
+        <div class="mb-3">
+            {{ form.query_text.label_tag }}
+            {{ form.query_text }}
+            {% if form.query_text.errors %}
+                <div class="text-danger">{{ form.query_text.errors }}</div>
+            {% endif %}
+        </div>
+
+        <button type="submit" class="btn btn-primary">Submit Query</button>
+        <a href="{% url 'jobs:job_detail' job.id %}" class="btn btn-secondary">Back to Job</a>
+    </form>
+</div>
+
+{% endblock %}

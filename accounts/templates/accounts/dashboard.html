@@ -1,0 +1,107 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h2 class="mb-4">Welcome, {{ user.email }}</h2>
+<p class="text-muted">Role: {{ user.get_role_display }}</p>
+
+<hr>
+
+{% if user.role == "CANDIDATE" %}
+<!-- Candidate Dashboard -->
+<div class="row g-4">
+
+    <!-- Saved Jobs Card -->
+    <div class="col-md-4">
+        <div class="card h-100 shadow-sm">
+            <div class="card-body">
+                <h5 class="card-title">Saved Jobs</h5>
+                <p class="card-text">View and manage jobs you have saved.</p>
+                <a href="#" class="btn btn-primary">View Saved Jobs</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Applications Card -->
+    <div class="col-md-4">
+        <div class="card h-100 shadow-sm">
+            <div class="card-body">
+                <h5 class="card-title">Your Applications</h5>
+                <p class="card-text">Track the status of jobs you have applied to.</p>
+                <a href="#" class="btn btn-primary">View Applications</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Resume / Optimizer Card -->
+    <div class="col-md-4">
+        <div class="card h-100 shadow-sm">
+            <div class="card-body">
+                <h5 class="card-title">Resume Upload / Optimizer</h5>
+                <p class="card-text">Upload your resume and optimize it with AI suggestions.</p>
+                <a href="#" class="btn btn-primary">Upload / Optimize</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Training Card -->
+    <div class="col-md-4">
+        <div class="card h-100 shadow-sm">
+            <div class="card-body">
+                <h5 class="card-title">VTS Training</h5>
+                <p class="card-text">Enroll in courses and track progress for certificates.</p>
+                <a href="#" class="btn btn-primary">View Training</a>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+{% elif user.role == "CONSULTANT" %}
+<!-- Consultant Dashboard -->
+<div class="row g-4">
+    <div class="col-md-6">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <h5 class="card-title">Query Queue</h5>
+                <p>Respond to escalated candidate queries.</p>
+                <a href="#" class="btn btn-primary">View Queue</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <h5 class="card-title">Appointments</h5>
+                <p>Schedule and manage meetings with candidates.</p>
+                <a href="#" class="btn btn-primary">View Appointments</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% elif user.role == "ADMIN" %}
+<!-- Admin Dashboard -->
+<div class="row g-4">
+    <div class="col-md-4">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <h5 class="card-title">Manage Jobs</h5>
+                <p>Create and manage job postings for candidates.</p>
+                <a href="/admin/" class="btn btn-primary">Go to Admin</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <h5 class="card-title">Manage Users</h5>
+                <p>View and edit candidate and consultant accounts.</p>
+                <a href="/admin/" class="btn btn-primary">Go to Admin</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endif %}
+
+{% endblock %}

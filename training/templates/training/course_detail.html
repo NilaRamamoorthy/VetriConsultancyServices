@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>{{ course.title }}</h2>
+<p>{{ course.description }}</p>
+
+{% if enrollment %}
+    <button class="btn btn-success" disabled>Enrolled</button>
+{% else %}
+    {% if subscription and subscription.is_pro %}
+        <form method="post">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-primary">Enroll Now</button>
+        </form>
+    {% else %}
+        <a href="{% url 'subscriptions:plans' %}" class="btn btn-outline-primary">
+            Upgrade to Pro to enroll
+        </a>
+        <p class="small text-muted mt-2">
+            Pro plan required to enroll in this course
+        </p>
+    {% endif %}
+{% endif %}
+
+{% endblock %}

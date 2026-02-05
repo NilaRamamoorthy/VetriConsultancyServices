@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block content %}
+<h2 class="mb-4">My Training Courses</h2>
+<div class="row g-4">
+
+    {% for enrollment in enrollments %}
+    <div class="col-md-4">
+        <div class="card h-100 shadow-sm">
+            <div class="card-body d-flex flex-column">
+                <h5 class="card-title">{{ enrollment.course.title }}</h5>
+                <p class="card-text">{{ enrollment.course.description|truncatechars:100 }}</p>
+                <a href="{% url 'training:my_course_detail' enrollment.course.id %}" class="btn btn-primary mt-auto">
+                    View Details
+                </a>
+                {% if enrollment.completed %}
+                <span class="badge bg-success mt-2">Completed</span>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    {% empty %}
+    <p class="text-muted">You have not enrolled in any courses yet.</p>
+    {% endfor %}
+
+</div>
+{% endblock %}

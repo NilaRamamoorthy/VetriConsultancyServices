@@ -1,0 +1,114 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+
+<div class="container my-5 text-center">
+    
+
+    <!-- Profile Button with Completion Circle -->
+    <a href="{% url 'profiles:candidate_profile' %}" class="text-decoration-none text-dark">
+        <div class="position-relative mx-auto mb-3" style="width:120px; height:120px;">
+            <svg class="position-absolute top-0 start-0" width="120" height="120">
+                <!-- Background Circle -->
+                <circle cx="60" cy="60" r="54" stroke="#e6e6e6" stroke-width="12" fill="none" />
+                <!-- Progress Circle -->
+                <circle cx="60" cy="60" r="54" stroke="#28a745" stroke-width="12" fill="none"
+                    stroke-dasharray="{{ profile_completion|floatformat:0 }}, 339" stroke-dashoffset="0"
+                    transform="rotate(-90 60 60)" />
+            </svg>
+            <div class="d-flex justify-content-center align-items-center position-absolute top-0 start-0 w-100 h-100">
+                <strong style="font-size:1.2rem;">{{ profile_completion }}%</strong>
+            </div>
+        </div>
+        <h5>My Profile</h5>
+    </a>
+
+    <!-- Other Candidate Cards -->
+       <div class="row g-4 mt-4 justify-content-center">
+
+    <!-- Saved Jobs -->
+    <div class="col-md-4">
+        <div class="card h-100 shadow-sm">
+            <div class="card-body">
+                <h5 class="card-title">Saved Jobs</h5>
+                <p class="card-text">View and manage jobs you have saved.</p>
+                <a href="{% url 'jobs:saved_jobs' %}" class="btn btn-primary">View Saved Jobs</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Applications -->
+    <div class="col-md-4">
+        <div class="card h-100 shadow-sm">
+            <div class="card-body">
+                <h5 class="card-title">Your Applications</h5>
+                <p class="card-text">Track the status of jobs you have applied to.</p>
+                <a href="{% url 'jobs:candidate_applied_jobs' %}" class="btn btn-primary">
+                    View Applications
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- VTS Training (VISIBLE TO ALL) -->
+    <div class="col-md-4">
+        <div class="card h-100 shadow-sm">
+            <div class="card-body">
+                <h5 class="card-title">VTS Training</h5>
+                <p class="card-text">
+                    Browse available training courses offered by VTS.
+                </p>
+                <a href="{% url 'training:course_list' %}" class="btn btn-primary">
+                    View Courses
+                </a>
+            </div>
+        </div>
+    </div>
+
+    {% if subscription.is_pro %}
+        <!-- My Courses (PRO ONLY) -->
+        <div class="col-md-4">
+            <div class="card h-100 shadow-sm border-success">
+                <div class="card-body d-flex flex-column">
+                    <h5 class="card-title">My Training Courses</h5>
+                    <p class="card-text">
+                        Track your enrolled courses, progress, and certificates.
+                    </p>
+                    <a href="{% url 'training:my_courses' %}" class="btn btn-success mt-auto">
+                        View My Courses
+                    </a>
+                </div>
+            </div>
+        </div>
+    {% else %}
+        <!-- Subscription Plans (FREE ONLY) -->
+        <div class="col-md-4">
+            <div class="card h-100 shadow-sm border-warning">
+                <div class="card-body d-flex flex-column">
+                    <h5 class="card-title">Upgrade to Pro</h5>
+                    {% if request.user.subscription.is_pro %}
+    <p>You are a Pro user</p>
+{% else %}
+    <a href="{% url 'subscriptions:subscribe_pro' %}">Upgrade to Pro</a>
+{% endif %}
+
+                    <p class="card-text">
+                        Unlock VTS training, certificates, and premium learning content.
+                    </p>
+                    <a href="{% url 'subscriptions:plans' %}" class="btn btn-warning mt-auto">
+                        View Plans
+                    </a>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+
+</div>
+
+
+    </div>
+
+</div>
+
+{% endblock %}
