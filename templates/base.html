@@ -96,33 +96,35 @@
         .logout-btn:hover {
             color: #DDE5C6;
         }
-.chatbot-btn {
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
-}
 
-.chatbot-modal {
-    display: none;
-    position: fixed;
-    bottom: 80px;
-    right: 20px;
-}
+        .chatbot-btn {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+        }
 
-.chatbot-box {
-    width: 300px;
-    background: #fff;
-    border-radius: 10px;
-    box-shadow: 0 0 10px #00000033;
-}
-.bot-message {
-    background: #f1f3f5;
-    padding: 10px 14px;
-    border-radius: 12px;
-    margin-bottom: 8px;
-    max-width: 80%;
-    font-size: 14px;
-}
+        .chatbot-modal {
+            display: none;
+            position: fixed;
+            bottom: 80px;
+            right: 20px;
+        }
+
+        .chatbot-box {
+            width: 300px;
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 0 10px #00000033;
+        }
+
+        .bot-message {
+            background: #f1f3f5;
+            padding: 10px 14px;
+            border-radius: 12px;
+            margin-bottom: 8px;
+            max-width: 80%;
+            font-size: 14px;
+        }
 
 
         /* Footer */
@@ -166,67 +168,51 @@
 
                     {% if user.is_authenticated %}
 
-                <!-- Greeting -->
-<li class="nav-item d-flex align-items-center gap-2">
-    {% if user.role == 'CANDIDATE' %}
+                    <!-- Greeting -->
+                    <li class="nav-item d-flex align-items-center gap-2">
+                        {% if user.role == 'CANDIDATE' %}
 
-        {% if user.profile.profile_image %}
-            <img src="{{ user.profile.profile_image.url }}"
-                 alt="Profile"
-                 class="rounded-circle"
-                 width="35"
-                 height="35"
-                 style="object-fit: cover;">
-        {% else %}
-            <img src="{% static 'images/default.jpg' %}"
-                 alt="Profile"
-                 class="rounded-circle"
-                 width="35"
-                 height="35"
-                 style="object-fit: cover;">
-        {% endif %}
+                        {% if user.profile.profile_image %}
+                        <img src="{{ user.profile.profile_image.url }}" alt="Profile" class="rounded-circle" width="35"
+                            height="35" style="object-fit: cover;">
+                        {% else %}
+                        <img src="{% static 'images/default.jpg' %}" alt="Profile" class="rounded-circle" width="35"
+                            height="35" style="object-fit: cover;">
+                        {% endif %}
 
-        <span class="text-white small">
-            Hi,
-            <strong>{{ user.profile.first_name|default:user.email }}</strong>
+                        <span class="text-white small">
+                            Hi,
+                            <strong>{{ user.profile.first_name|default:user.email }}</strong>
 
-            {% if user.subscription.is_pro %}
-                <span class="badge bg-warning text-dark ms-1">PRO</span>
+                            {% if user.subscription.is_pro %}
+                            <span class="badge bg-warning text-dark ms-1">PRO</span>
 
-            {% else %}
-                <span class="badge bg-secondary ms-1">FREE</span>
-            {% endif %}
-        </span>
+                            {% else %}
+                            <span class="badge bg-secondary ms-1">FREE</span>
+                            {% endif %}
+                        </span>
 
-    {% elif user.role == 'CONSULTANT' %}
+                        {% elif user.role == 'CONSULTANT' %}
 
-        {% if user.consultant_profile.profile_image %}
-            <img src="{{ user.consultant_profile.profile_image.url }}"
-                 alt="Profile"
-                 class="rounded-circle"
-                 width="35"
-                 height="35"
-                 style="object-fit: cover;">
-        {% else %}
-            <img src="{% static 'images/default.jpg' }}"
-                 alt="Profile"
-                 class="rounded-circle"
-                 width="35"
-                 height="35"
-                 style="object-fit: cover;">
-        {% endif %}
+                        {% if user.consultant_profile.profile_image %}
+                        <img src="{{ user.consultant_profile.profile_image.url }}" alt="Profile" class="rounded-circle"
+                            width="35" height="35" style="object-fit: cover;">
+                        {% else %}
+                        <img src="{% static 'images/default.jpg' }}" alt="Profile" class="rounded-circle" width="35"
+                            height="35" style="object-fit: cover;">
+                        {% endif %}
 
-        <span class="text-white small">
-            Hi,
-            <strong>{{ user.consultant_profile.first_name|default:user.email }}</strong>
-        </span>
+                        <span class="text-white small">
+                            Hi,
+                            <strong>{{ user.consultant_profile.first_name|default:user.email }}</strong>
+                        </span>
 
-    {% else %}
-        <span class="text-white small">
-            Hi, <strong>{{ user.email }}</strong>
-        </span>
-    {% endif %}
-</li>
+                        {% else %}
+                        <span class="text-white small">
+                            Hi, <strong>{{ user.email }}</strong>
+                        </span>
+                        {% endif %}
+                    </li>
 
 
 
@@ -270,100 +256,94 @@
         {% block content %}{% endblock %}
     </div>
     <!-- Chatbot Button -->
-<!-- Chatbot Floating Button -->
-<button id="chatbotBtn" class="btn btn-primary" style="position:fixed; bottom:20px; right:20px; border-radius:50%; width:60px; height:60px;">
-    💬 
-</button>
+    {% if user.is_authenticated %}
+    <!-- Chatbot Floating Button -->
+    <button id="chatbotBtn" class="btn btn-primary"
+        style="position:fixed; bottom:20px; right:20px; border-radius:50%; width:60px; height:60px;">
+        💬
+    </button>
 
-<!-- Chatbot Modal -->
-<div id="chatbotModal" style="display:none; position:fixed; bottom:90px; right:20px; width:300px; max-height:400px; background:white; border:1px solid #ccc; border-radius:8px; box-shadow:0 0 10px rgba(0,0,0,0.2); overflow:hidden; z-index:9999;">
-    <div id="chatHeader" style="background:#007bff; color:white; padding:10px; cursor:pointer;">
-        Help Chatbot
-        <span id="closeChat" style="float:right; cursor:pointer;">&times;</span>
-    </div>
-    <div id="chatBody" style="padding:10px; height:300px; overflow-y:auto; background:#f8f9fa;">
-        <div id="chatMessages"></div>
-    </div>
-    <div style="padding:5px;">
-        <input type="text" id="chatInput" placeholder="Type your question..." style="width:75%; padding:5px;">
-        <button id="chatSendBtn" class="btn btn-primary btn-sm">Send</button>
-    </div>
-</div>
-
-    {% if not hide_nav %}
-    <!-- <footer>
-        <div class="container">
-            <p class="mb-1">&copy; 2026 Vetri Consultancy Service. All rights reserved.</p>
-            <p class="mb-0">
-                <a href="#">Privacy Policy</a> | <a href="#">Terms of Service</a>
-            </p>
+    <!-- Chatbot Modal -->
+    <div id="chatbotModal"
+        style="display:none; position:fixed; bottom:90px; right:20px; width:300px; max-height:400px; background:white; border:1px solid #ccc; border-radius:8px; box-shadow:0 0 10px rgba(0,0,0,0.2); overflow:hidden; z-index:9999;">
+        <div id="chatHeader" style="background:#007bff; color:white; padding:10px; cursor:pointer;">
+            Help Chatbot
+            <span id="closeChat" style="float:right; cursor:pointer;">&times;</span>
         </div>
-    </footer> -->
+        <div id="chatBody" style="padding:10px; height:300px; overflow-y:auto; background:#f8f9fa;">
+            <div id="chatMessages"></div>
+        </div>
+        <div style="padding:5px;">
+            <input type="text" id="chatInput" placeholder="Type your question..." style="width:75%; padding:5px;">
+            <button id="chatSendBtn" class="btn btn-primary btn-sm">Send</button>
+        </div>
+    </div>
+
     {% endif %}
-<script>
-const chatbotBtn = document.getElementById('chatbotBtn');
-const chatbotModal = document.getElementById('chatbotModal');
-const closeChat = document.getElementById('closeChat');
-const chatSendBtn = document.getElementById('chatSendBtn');
-const chatInput = document.getElementById('chatInput');
-const chatMessages = document.getElementById('chatMessages');
+    <script>
+        const chatbotBtn = document.getElementById('chatbotBtn');
+        const chatbotModal = document.getElementById('chatbotModal');
+        const closeChat = document.getElementById('closeChat');
+        const chatSendBtn = document.getElementById('chatSendBtn');
+        const chatInput = document.getElementById('chatInput');
+        const chatMessages = document.getElementById('chatMessages');
 
-let greetingLoaded = false;
+        let greetingLoaded = false;
 
-// Open chatbot + load greeting
-chatbotBtn.onclick = async () => {
-    chatbotModal.style.display = 'block';
+        // Open chatbot + load greeting
+        chatbotBtn.onclick = async () => {
+            chatbotModal.style.display = 'block';
 
-    if (!greetingLoaded) {
-        const res = await fetch("/chatbot/greeting/");
-        const data = await res.json();
+            if (!greetingLoaded) {
+                const res = await fetch("/chatbot/greeting/");
+                const data = await res.json();
 
-        const botDiv = document.createElement('div');
-        botDiv.className = "bot-message";
-        botDiv.textContent = data.message;
-        chatMessages.appendChild(botDiv);
+                const botDiv = document.createElement('div');
+                botDiv.className = "bot-message";
+                botDiv.textContent = data.message;
+                chatMessages.appendChild(botDiv);
 
-        greetingLoaded = true;
-    }
-};
+                greetingLoaded = true;
+            }
+        };
 
-closeChat.onclick = () => {
-    chatbotModal.style.display = 'none';
-};
+        closeChat.onclick = () => {
+            chatbotModal.style.display = 'none';
+        };
 
-// Send message
-chatSendBtn.onclick = async () => {
-    const message = chatInput.value.trim();
-    if (!message) return;
+        // Send message
+        chatSendBtn.onclick = async () => {
+            const message = chatInput.value.trim();
+            if (!message) return;
 
-    const userDiv = document.createElement('div');
-    userDiv.textContent = "You: " + message;
-    userDiv.style.textAlign = 'right';
-    chatMessages.appendChild(userDiv);
+            const userDiv = document.createElement('div');
+            userDiv.textContent = "You: " + message;
+            userDiv.style.textAlign = 'right';
+            chatMessages.appendChild(userDiv);
 
-    chatInput.value = '';
+            chatInput.value = '';
 
-    const response = await fetch("{% url 'chatbot:ask' %}", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-            "X-CSRFToken": "{{ csrf_token }}",
-        },
-        body: JSON.stringify({ message })
-    });
+            const response = await fetch("{% url 'chatbot:ask' %}", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRFToken": "{{ csrf_token }}",
+                },
+                body: JSON.stringify({ message })
+            });
 
-    const data = await response.json();
+            const data = await response.json();
 
-    const botDiv = document.createElement('div');
-    botDiv.className = "bot-message";
-    botDiv.textContent = data.response;
-    chatMessages.appendChild(botDiv);
+            const botDiv = document.createElement('div');
+            botDiv.className = "bot-message";
+            botDiv.textContent = data.response;
+            chatMessages.appendChild(botDiv);
 
-    chatMessages.scrollTop = chatMessages.scrollHeight;
-};
-</script>
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        };
+    </script>
 
-<!-- <script>
+    <!-- <script>
 const chatbotBtn = document.getElementById("chatbot-btn");
 const chatBox = document.getElementById("chatbot-box");
 const chatMessages = document.getElementById("chat-messages");
